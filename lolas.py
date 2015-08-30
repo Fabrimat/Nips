@@ -25,9 +25,8 @@ T = '\033[93m'   # tan
 
 
 
-def ip_scanner():
+#def ip_scanner():
 try:
-
     #Presentation
     print ("Ip Scanner v0.1")
     print ("... type enter to continue ")
@@ -96,7 +95,6 @@ try:
                     else:
                         print ("\tPort {}: Closed".format(port))
                         clsd = clsd + 1
-
                 elif proc.returncode == 2:
                     if showerr == "n":
                         print('%s no response' % ip)
