@@ -26,6 +26,7 @@ T = '\033[93m'   # tan
 
 
 def ip_scanner():
+try:
 
     #Presentation
     print ("Ip Scanner v0.1")
