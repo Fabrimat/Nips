@@ -7,7 +7,7 @@ import subprocess
 import sys
 from datetime import datetime
 import logging
-import functionscanner
+#import functionscanner
 
 # Clear the screen
 subprocess.call('clear', shell=True)
