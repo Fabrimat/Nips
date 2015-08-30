@@ -7,20 +7,37 @@ import subprocess
 import sys
 from datetime import datetime
 import logging
+import functionscanner
 
 # Clear the screen
 subprocess.call('clear', shell=True)
 
-devnull = open(os.devnull, 'wb')
-try:
+# Console colors
+W = '\033[0m'    # white (normal)
+R = '\033[31m'   # red
+G = '\033[32m'   # green
+O = '\033[33m'   # orange
+B = '\033[34m'   # blue
+P = '\033[35m'   # purple
+C = '\033[36m'   # cyan
+GR = '\033[37m'  # gray
+T = '\033[93m'   # tan
+
+
+
+def ip_scanner():
+
     #Presentation
-    print "Ip Scanner v0.1"
-    print "... type enter to continue "
+    print ("Ip Scanner v0.1")
+    print ("... type enter to continue ")
     raw_input()
-    #Ask for inputs
+
+    #Ask for inputs and define variables
     str1=raw_input("Enter the ip range ( ex: 192.168.0 ) - ")
-    port=input("Enter the port ( ex: 80 ) - ")
-    showerr=raw_input("Print only the active ips? (y/n) - ")
+    port=80
+    port=input("Enter the port ( default: 80 ) - ")
+    showerr=raw_input("print (only the active ips? (y/n) - ")
+    devnull = open(os.devnull, 'wb')
     #outlog=raw_input("Save the outputs into a log file? (y/n) - ")
 
     #starttime = datetime.now()
@@ -30,13 +47,12 @@ try:
     #    logging.basicConfig(level=logging.DEBUG, filename=(logfilename,starttime), filemode="a+",
     #                    format="%(asctime)-15s %(levelname)-8s %(message)s")
 
-    print "scanning ip range ",str1
-    #print "-=" * 21
+    print ("scanning ip range ",str1)
 
     if str1 == "" or type(port) != int:
-     print "-=" * 21
-     print "Please check your inputs and try again..."
-     print "-=" * 21
+     print ("-=" * 21)
+     print ("Please check your inputs and try again...")
+     print ("-=" * 21)
      sys.exit()
 
      #Information variables
@@ -50,20 +66,18 @@ try:
     # Check what time the scan started
     t1 = datetime.now()
 
-    print ""
-    #print "=-" * 30
-    print ">Please wait, pinging remote ips."
-    #print "=-" * 30
-    print ""
+    print ("")
+    print (">Please wait, pinging remote ips.")
+    print ("")
     #Start pinging and scanning
     for n in range(1,255): # start ping processes
         ip = str1+".%d" % n
         p.append((ip, Popen(['ping', '-c', '3', ip], stdout=devnull)))
 
-    #print "=-" * 30
-    print ">Starting port scan."
-    #print "=-" * 30
-    print ""
+    #print ("=-" * 30)
+    print (">Starting port scan.")
+    #print ("=-" * 30)
+    print ("")
 
     while p:
         for i, (ip, proc) in enumerate(p[:]):
@@ -76,10 +90,10 @@ try:
                     result = sock.connect_ex((ip, port))
                     sock.close()
                     if result == 0:
-                        print "\tPort {}: Open".format(port)
+                        print ("\tPort {}: Open".format(port))
                         opn = opn + 1
                     else:
-                        print "\tPort {}: Closed".format(port)
+                        print ("\tPort {}: Closed".format(port))
                         clsd = clsd + 1
 
                 elif proc.returncode == 2:
@@ -111,15 +125,15 @@ t2 = datetime.now()
 total =  t2 - t1
 
 # Printing the information to screen
-print 'Scanning Completed in: ', total
-print ""
-print "-=" * 9
-print "Network status"
-print "-=" * 9
-print "Active ips [ ",act," ]"
-print "Error ips [ ",err," ]"
-print "No response [ ",nrp," ]"
-print "Open ports   [ ",opn," ]"
-print "Closed ports [ ",clsd," ]"
-print ""
-print "Good bye!"
+print ('Scanning Completed in: ', total)
+print ("")
+print ("-=" * 9)
+print ("Network status")
+print ("-=" * 9)
+print ("Active ips [ ",act," ]")
+print ("Error ips [ ",err," ]")
+print ("No response [ ",nrp," ]")
+print ("Open ports   [ ",opn," ]")
+print ("Closed ports [ ",clsd," ]")
+print ("")
+print ("Good bye!")
