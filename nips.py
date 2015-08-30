@@ -6,7 +6,7 @@ import socket
 import subprocess
 import sys
 from datetime import datetime
-import logging
+#import logging
 #import functionscanner
 
 # Clear the screen
