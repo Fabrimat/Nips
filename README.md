@@ -1,1 +1,1 @@
-Lolas actually is just an ip scanner.
+Nips is a Ip and Port scanner.
