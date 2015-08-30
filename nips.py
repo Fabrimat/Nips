@@ -28,7 +28,7 @@ T = '\033[93m'   # tan
 #def ip_scanner():
 try:
     #Presentation
-    print ("Ip Scanner v0.1")
+    print ("Nips v0.1 - Network Ip Port Scanner")
     print ("... type enter to continue ")
     raw_input()
 
