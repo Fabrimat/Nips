@@ -36,7 +36,7 @@ try:
     str1=raw_input("Enter the ip range ( ex: 192.168.0 ) - ")
     port=80
     port=input("Enter the port ( default: 80 ) - ")
-    showerr=raw_input("print (only the active ips? (y/n) - ")
+    showerr=raw_input("Print only the active ips? (y/n) - ")
     devnull = open(os.devnull, 'wb')
     #outlog=raw_input("Save the outputs into a log file? (y/n) - ")
 
@@ -47,7 +47,7 @@ try:
     #    logging.basicConfig(level=logging.DEBUG, filename=(logfilename,starttime), filemode="a+",
     #                    format="%(asctime)-15s %(levelname)-8s %(message)s")
 
-    print ("scanning ip range ",str1)
+    #print ("Scanning ip range ",str1)
 
     if str1 == "" or type(port) != int:
      print ("-=" * 21)
