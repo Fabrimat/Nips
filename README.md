@@ -1,1 +1,1 @@
-Lolas is an Ip Scanner.
+Lolas actually is just an ip scanner.
