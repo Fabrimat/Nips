@@ -8,9 +8,9 @@ import sys
 from datetime import datetime
 import logging
 
+#def IpPortScanner(): - Coming soon!
+
 #Define variables
-iprange=None
-showerr=None
 p = [] # ip -> process
 act=0
 nrp=0
@@ -18,9 +18,6 @@ err=0
 opn=0
 clsd=0
 port=0
-t1=0
-t2=0
-total=0
 devnull = open(os.devnull, 'wb')
 
 # Clear the screen
@@ -70,10 +67,8 @@ try:
         ip = iprange+".%d" % n
         p.append((ip, Popen(['ping', '-c', '3', ip], stdout=devnull)))
 
-    #print ("=-" * 30)
     print (">Starting port scan. This can be take a while.")
     logging.info('Starting port scan.')
-    #print ("=-" * 30)
     print ("")
 
     while p:
