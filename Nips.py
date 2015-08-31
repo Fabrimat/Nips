@@ -112,7 +112,7 @@ try:
 #Errors outputs
 except KeyboardInterrupt:
     sys.exit("\n You pressed Ctrl+C")
-    logging.info('Ctrl+C were pressed')
+    logging.info('You pressed Ctrl+C')
 
 except socket.gaierror:
     sys.exit('\n Hostname could not be resolved. Exiting')
