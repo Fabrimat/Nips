@@ -1,5 +1,5 @@
 ## About
-Nips is a Ip scanner that provide to check if an ip is active or not. It also can check if one port is open or closed for each ip.
+Nips is an Ip scanner that provide to check if an ip is active or not. It also can check if one port is open or closed for each ip.
 
 Nips works on Linux and is licensed under the GNU General Public License 3.
 
