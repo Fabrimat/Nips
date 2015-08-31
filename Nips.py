@@ -27,7 +27,7 @@ devnull = open(os.devnull, 'wb')
 subprocess.call('clear', shell=True)
 
 #Configuring logging
-ogger = logging.getLogger('LogScanner')
+logger = logging.getLogger('LogScanner')
 logging.basicConfig(filename='Nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
 #Presentation
