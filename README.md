@@ -19,4 +19,4 @@ If you don't know how to code, you can help us by <a href="https://github.com/Fa
 Nips is licensed under the GNU General Public license 3. See [LICENSE](LICENSE) for more information.
 
 ## Project Status & Download
-Nips's current version is **1.0**. You can download the latest release from <a href="https://github.com/Fabrimat/Nips/archive/master.zip">here</a>. Otherwise you can get the latest development version by cloning this repository.
+Nips's current version is **1.0**. You can download the latest release from <a href="https://github.com/Fabrimat/Nips/releases/tag/1.0">here</a>. Otherwise you can get the latest development version by cloning this repository.
