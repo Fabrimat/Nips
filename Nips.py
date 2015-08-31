@@ -31,7 +31,7 @@ ogger = logging.getLogger('LogScanner')
 logging.basicConfig(filename='Nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
 #Presentation
-print ("Nips v0.1 - Network Ip Port Scanner")
+print ("Nips v1.0 - Network Ip Port Scanner")
 print ("... type enter to continue ")
 raw_input()
 
