@@ -41,6 +41,7 @@ port=input("Enter the port ( ex: 80 ) - ")
 logging.info('Port: %s',port)
 showerr=raw_input("Print only the active ips? (y/n) - ")
 logging.info('Only active ips? %s',showerr)
+#socketdeftime=input("Enter the timeout ( ex: 0.5 ) - ")
 
 #A little alert
 print("")
@@ -49,7 +50,7 @@ time.sleep(0.5)
 print ("")
 
 #Checking errors
-if iprange == "" or type(port) != int or port == 0 or len(iprange) > 11 or iprange.count(".") != 2:
+if iprange == "" or type(port) != int or port == 0 or len(iprange) > 11 or len(iprange) < 5 or iprange.count(".") != 2:
     print ("-=" * 21)
     print ("Please check your inputs and try again...")
     print ("-=" * 21)
@@ -60,14 +61,14 @@ try:
     # Check what time the scan started
     t1 = datetime.now()
     #Start pinging and scanning
-    print ">Scanning ip range ",iprange
+    print "Scanning ip range ",iprange
     logging.info('Scanning ip range')
     print ("")
     for n in range(1,255): # start ping processes
         ip = iprange+".%d" % n
         p.append((ip, Popen(['ping', '-c', '3', ip], stdout=devnull)))
 
-    print (">Starting port scan. This can be take a while.")
+    print ("Starting port scan. This can be take a while.")
     logging.info('Starting port scan.')
     print ("")
 
@@ -79,8 +80,18 @@ try:
                     print('%s active' % ip)
                     logging.info('%s active',ip)
                     act = act + 1
+                    socket.setdefaulttimeout(0.5)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     result = sock.connect_ex((ip, port))
+                    try:
+                        host = socket.gethostbyaddr(ip)
+                        print "\tHostname:",host[0]
+                        logging.info("Hostname: %s",host[0])
+                        logging.info("Alias list: %s",host[1])
+                        logging.info("Ip Addresses List: %s",host[2])
+                        host = None
+                    except socket.error:
+                        logging.info("Hostname: Empty.")
                     sock.close()
                     if result == 0:
                         print ("\tPort {}: Open".format(port))
@@ -109,13 +120,13 @@ except KeyboardInterrupt:
     sys.exit("\n You pressed Ctrl+C")
     logging.info('You pressed Ctrl+C')
 
-except socket.gaierror:
-    sys.exit('\n Hostname could not be resolved. Exiting')
-    logging.info('Hostname could not be resolved.')
+#except socket.gaierror:
+#    sys.exit('\n Hostname could not be resolved. Exiting')
+#    logging.info('Hostname could not be resolved.')
 
-except socket.error:
-    sys.exit("\n Couldn't connect to server")
-    logging.info("Couldn't connect to server")
+#except socket.error:
+#    sys.exit("\n Couldn't connect to server")
+#    logging.info("Couldn't connect to server")
 
 # Checking the time again
 t2 = datetime.now()
