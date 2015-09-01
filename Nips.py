@@ -8,6 +8,44 @@ import sys
 from datetime import datetime
 import logging
 
+# Clear the screen
+def cls():
+    if os.name == "posix":
+        subprocess.call('clear', shell=True)
+    elif os.name == "nt":
+        os.system(['clear','cls'][os.name == 'nt'])
+
+cls()
+
+def ascipres():
+    print "\n\n\n"
+    print "\tNNNNNNNN        NNNNNNNN  iiii                                      "
+    print "\tN:::::::N       N::::::N i::::i                                     "
+    print "\tN::::::::N      N::::::N  iiii                                      "
+    print "\tN:::::::::N     N::::::N                                            "
+    print "\tN::::::::::N    N::::::Niiiiiiippppp   ppppppppp       ssssssssss   "
+    print "\tN:::::::::::N   N::::::Ni:::::ip::::ppp:::::::::p    ss::::::::::s  "
+    print "\tN:::::::N::::N  N::::::N i::::ip:::::::::::::::::p ss:::::::::::::s "
+    print "\tN::::::N N::::N N::::::N i::::ipp::::::ppppp::::::ps::::::ssss:::::s"
+    print "\tN::::::N  N::::N:::::::N i::::i p:::::p     p:::::p s:::::s  ssssss "
+    print "\tN::::::N   N:::::::::::N i::::i p:::::p     p:::::p   s::::::s      "
+    print "\tN::::::N    N::::::::::N i::::i p:::::p     p:::::p      s::::::s   "
+    print "\tN::::::N     N:::::::::N i::::i p:::::p    p::::::pssssss   s:::::s "
+    print "\tN::::::N      N::::::::Ni::::::ip:::::ppppp:::::::ps:::::ssss::::::s"
+    print "\tN::::::N       N:::::::Ni::::::ip::::::::::::::::p s::::::::::::::s "
+    print "\tN::::::N        N::::::Ni::::::ip::::::::::::::pp   s:::::::::::ss  "
+    print "\tNNNNNNNN         NNNNNNNiiiiiiiip::::::pppppppp      sssssssssss    "
+    print "\t                                p:::::p                             "
+    print "\t                                p:::::p                             "
+    print "\t                               p:::::::p                            "
+    print "\t                               p:::::::p                            "
+    print "\t                               p:::::::p                            "
+    print "\t                               ppppppppp                            "
+    print "\n\n\n\n"
+    return
+
+ascipres()
+
 #def IpPortScanner(): - Coming soon!
 
 #Define variables
@@ -19,41 +57,58 @@ opn=0
 clsd=0
 port=0
 devnull = open(os.devnull, 'wb')
+programinfo = "Nips v1.0 - Portsweep by Fabrimat"
 
-# Clear the screen
-subprocess.call('clear', shell=True)
+# Console colors
+W = '\033[0m'    # (normal)
+R = '\033[31m'   # red
+G = '\033[32m'   # green
+O = '\033[33m'   # orange
+B = '\033[34m'   # blue
+P = '\033[35m'   # purple
+C = '\033[36m'   # cyan
+GR = '\033[37m'  # gray
+T = '\033[93m'   # tan
 
 #Configuring logging
 logger = logging.getLogger('LogScanner')
 logging.basicConfig(filename='Nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
 #Presentation
-print ("Nips v1.0 - Network Ip Port Scanner")
-print ("... type enter to continue ")
+print R + programinfo + W
+print T + "... type enter to continue " + W
 raw_input()
 
+cls()
+
+# Start log session in the log file
 logging.info('######### NEW LOG SESSION ########')
+logging.info('%s',programinfo)
 
 #Ask for inputs
-iprange=raw_input("Enter the ip range ( ex: 192.168.0 ) - ")
+print R + programinfo + W
+print T + "Please enter the inputs.\n" + W
+iprange=raw_input("Enter the ip range " + GR + "( ex: 192.168.0 )" + W + " - ")
 logging.info('IP Range: %s',iprange)
-port=input("Enter the port ( ex: 80 ) - ")
+port=input("Enter the port " + GR + "( ex: 80 )" + W + " - ")
 logging.info('Port: %s',port)
-showerr=raw_input("Print only the active ips? (y/n) - ")
+showerr=raw_input("Print only the active ips? "+ GR + "(y/n)" + W + " - ")
 logging.info('Only active ips? %s',showerr)
-#socketdeftime=input("Enter the timeout ( ex: 0.5 ) - ")
+showhost=raw_input("Show the hostnames? " + GR + "(y/n)" + W + " - ")
+logging.info('Hostnames? %s',showhost)
+#socketdeftime=input("Enter the timeout " + GR + "( ex: 0.5 )" + W + " - ")
 
 #A little alert
 print("")
-print 'The outputs will be saved as "Nips.log".'
+print 'The outputs will be saved as ' + GR + '"Nips.log"' + W + '.'
 time.sleep(0.5)
 print ("")
 
 #Checking errors
-if iprange == "" or type(port) != int or port == 0 or len(iprange) > 11 or len(iprange) < 5 or iprange.count(".") != 2:
-    print ("-=" * 21)
-    print ("Please check your inputs and try again...")
-    print ("-=" * 21)
+if iprange == "" or type(port) != int or port == 0 or len(iprange) > 11 or len(iprange) < 5 or iprange.count(".") != 2 or (showerr != "y" and showerr != "n") or(showhost != "y" and showhost != "n"):
+    print "-=" * 21
+    print R + "Please check your inputs and try again..." + W
+    print "-=" * 21
     logging.error('Invalid Inputs: %s - %s - %s - %s - %s',iprange,type(port),port,len(iprange),iprange.count("."))
     sys.exit()
 
@@ -61,7 +116,7 @@ try:
     # Check what time the scan started
     t1 = datetime.now()
     #Start pinging and scanning
-    print "Scanning ip range ",iprange
+    print GR + "Scanning ip range " + C,iprange + ".1 - " + iprange + ".255" + W
     logging.info('Scanning ip range')
     print ("")
     for n in range(1,255): # start ping processes
@@ -83,24 +138,26 @@ try:
                     socket.setdefaulttimeout(0.5)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     result = sock.connect_ex((ip, port))
-                    try:
-                        host = socket.gethostbyaddr(ip)
-                        print "\tHostname:",host[0]
-                        logging.info("Hostname: %s",host[0])
-                        logging.info("Alias list: %s",host[1])
-                        logging.info("Ip Addresses List: %s",host[2])
-                        host = None
-                    except socket.error:
-                        logging.info("Hostname: Empty.")
-                    sock.close()
                     if result == 0:
-                        print ("\tPort {}: Open".format(port))
+                        print "\tPort" ,port, ":" + G + " Open" + W
                         logging.info('Port %s: Open',port)
                         opn = opn + 1
                     else:
-                        print ("\tPort {}: Closed".format(port))
+                        print "\tPort" ,port, ":" + R + " Closed" + W
                         logging.info('Port %s: Closed',port)
                         clsd = clsd + 1
+                    if showhost == "y":
+                        try:
+                            host = socket.gethostbyaddr(ip)
+                            print "\tHostname:",host[0]
+                            logging.info("Hostname: %s",host[0])
+                            logging.info("Alias list: %s",host[1])
+                            logging.info("Ip Addresses List: %s",host[2])
+                            host = None, None, None
+                        except socket.error:
+                            logging.info("Hostname: Empty.")
+                    sock.close()
+
                 elif proc.returncode == 2:
                     if showerr == "n":
                         print('%s no response' % ip)
@@ -148,10 +205,10 @@ print ""
 print "-=" * 9
 print "Network status"
 print "-=" * 9
-print "Active ips [ ",act," ]"
-print "Error ips [ ",err," ]"
-print "No response ips [ ",nrp," ]"
-print "Open ports   [ ",opn," ]"
-print "Closed ports [ ",clsd," ]"
+print "Active ips \t[ " + C,act, W + " ]"
+print "Error ips \t[ " + C,err, W + " ]"
+print "No response ips [ " + C,nrp, W + " ]"
+print "Open ports   \t[ " + C,opn, W + " ]"
+print "Closed ports \t[ " + C,clsd, W + " ]"
 print ""
 print "Good bye!"
