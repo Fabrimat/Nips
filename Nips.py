@@ -76,6 +76,9 @@ opn=0
 clsd=0
 port=0
 devnull = open(os.devnull, 'wb')
+error = 0
+showerr = "y"
+showhost = "n"
 
 #Configuring logging
 logger = logging.getLogger('LogScanner')
@@ -93,17 +96,21 @@ logging.info('######### NEW LOG SESSION ########')
 logging.info('%s',programinfo)
 
 #Ask for inputs
-print R + programinfo + W
-print T + "Please enter the inputs.\n" + W
-iprange=raw_input( G + "Enter the ip range " + GR + "( ex: 192.168.0 )" + W + " - ")
-logging.info('IP Range: %s',iprange)
-port=input( G + "Enter the port " + GR + "( ex: 80 )" + W + " - ")
-logging.info('Port: %s',port)
-showerr=raw_input( G + "Print only the active ips? "+ GR + "(y/n)" + W + " - ")
-logging.info('Only active ips? %s',showerr)
-showhost=raw_input( G + "Show the hostnames? " + GR + "(y/n)" + W + " - ")
-logging.info('Hostnames? %s',showhost)
-#socketdeftime=input("Enter the timeout " + GR + "( ex: 0.5 )" + W + " - ")
+try:
+    print R + programinfo + W
+    print T + "Please enter the inputs.\n" + W
+    iprange=raw_input( G + "Enter the ip range " + GR + "( ex: 192.168.0 )" + W + " - ")
+    logging.info('IP Range: %s',iprange)
+    port=input( G + "Enter the port " + GR + "( ex: 80 )" + W + " - ")
+    logging.info('Port: %s',port)
+    showerr=raw_input( G + "Print only the active ips? "+ GR + "(y/n)" + W + " - ")
+    logging.info('Only active ips? %s',showerr)
+    showhost=raw_input( G + "Show the hostnames? " + GR + "(y/n)" + W + " - ")
+    logging.info('Hostnames? %s',showhost)
+    #socketdeftime=input("Enter the timeout " + GR + "( ex: 0.5 )" + W + " - ")
+except NameError:
+    error = 1
+
 
 #A little alert
 print("")
@@ -112,7 +119,6 @@ time.sleep(0.5)
 print ("")
 
 #Checking errors
-error = 0
 if iprange == "" or len(iprange) > 11 or len(iprange) < 5 or iprange.count(".") != 2:
     print G + "-=" * 29
     print R + "Invalid Ip, please check your inputs and try again..." + W
@@ -129,7 +135,7 @@ if (showerr != "y" and showerr != "n" and showerr != "yes" and showerr != "no") 
     print G + "-=" * 29
     print R + "Invalid Inputs, please check your inputs and try again..." + W
     print G + "-=" * 29
-    logging.error('Invalid Inputs: %s - %s. Enter a valid value (y/n)',showerr,showhost)
+    logging.error('Invalid Inputs: %s - %s. Enter a valid integer value (y/n)',showerr,showhost)
     error = 1
 if error == 1:
     print ""
@@ -139,10 +145,10 @@ try:
     # Check what time the scan started
     t1 = datetime.now()
     #Start pinging and scanning
-    print GR + "Scanning ip range " + C,iprange + ".1 - " + iprange + ".255" + R
+    print GR + "Scanning ip range " + C,iprange + ".0 - " + iprange + ".255" + R
     logging.info('Scanning ip range')
     print ("")
-    for n in range(1,255): # start ping processes
+    for n in range(0,255): # start ping processes
         ip = iprange+".%d" % n
         p.append((ip, Popen(['ping', '-c', '3', ip], stdout=devnull)))
 
@@ -197,7 +203,7 @@ try:
 
 #Errors outputs
 except KeyboardInterrupt:
-    sys.exit("\n You pressed Ctrl+C")
+    sys.exit(R + "\n You pressed Ctrl+C" + W)
     logging.info('You pressed Ctrl+C')
 
 # Checking the time again
