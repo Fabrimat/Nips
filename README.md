@@ -8,12 +8,10 @@ The functioning is very simple, after have inserted the ip range (192.168.0) and
 
 ## Requirements
 * Linux.
-* Python2.
+* Python.
 
 ## Help needed
-If you are a Python developer you can help us improve Nips. Feel free to take a look at the <a href="https://github.com/Fabrimat/Nips/issues">bug tracker</a> for some tasks to do.
-
-If you don't know how to code, you can help us by <a href="https://github.com/Fabrimat/Nips/issues">proposing improvements or reporting bugs</a>.
+You can help me by <a href="https://github.com/Fabrimat/Nips/issues">proposing improvements or reporting bugs</a>.
 
 ## License
 Nips is licensed under the GNU General Public license 3. See [LICENSE](LICENSE) for more information.
