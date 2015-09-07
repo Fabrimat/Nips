@@ -8,7 +8,7 @@ The functioning is very simple, after have inserted the initial and the final ip
 
 ## Requirements
 * Linux.
-* Python.
+* Python3.
 
 ## Help needed
 You can help me by <a href="https://github.com/Fabrimat/Nips/issues">proposing improvements or reporting bugs</a>.
@@ -17,4 +17,4 @@ You can help me by <a href="https://github.com/Fabrimat/Nips/issues">proposing i
 Nips is licensed under the GNU General Public license 3. See [LICENSE](LICENSE) for more information.
 
 ## Project Status & Download
-Nips's current version is **2.0**. You can download the latest release from <a href="https://github.com/Fabrimat/Nips/releases/tag/2.0">here</a>. Otherwise you can get the latest development version by cloning this repository.
+Nips's current version is **2.1**. You can download the latest release from <a href="https://github.com/Fabrimat/Nips/releases/tag/2.1">here</a>. Otherwise you can get the latest development version by cloning this repository.
