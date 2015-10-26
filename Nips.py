@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 '''
-    Nips v2.1 - Portsweep
+    Nips v2.2 - Portsweep
     Author: Fabrimat
     Repository: https://github.com/Fabrimat/Nips
 '''
@@ -8,6 +9,7 @@ import os
 import sys
 if os.name != "posix":
     sys.exit("\nOS not supported.\n")
+    logging.error("%s not supported.",os.name)
 import time
 from subprocess import Popen
 import socket
@@ -16,7 +18,7 @@ from datetime import datetime
 import logging
 import fcntl
 import struct
-#import ipaddress
+import ipaddress
 import ifcfg
 import re
 
@@ -32,13 +34,16 @@ GR = '\033[37m'  # gray
 T = '\033[93m'   # tan
 
 #Define global variables
-programinfo = "Nips v2.1 - Portsweep by Fabrimat"
+version = "2.2"
+programinfo = "Nips v" + version + " - Portsweep by Fabrimat"
 
 # Clear the screen
 def cls():
+    logging.info('Clearing screen...')
     os.system('clear')
 
 def asciipres():
+    logging.info('Printing the presentation')
     print (G + "\n\n\n")
     print ("\tNNNNNNNN        NNNNNNNN  iiii                                      ")
     print ("\tN:::::::N       N::::::N i::::i                                     ")
@@ -61,7 +66,7 @@ def asciipres():
     print ("\t                               p:::::::p                            ")
     print ("\t                               p:::::::p                            ")
     print ("\t                               p:::::::p                            ")
-    print ("\t                               ppppppppp                        v2.1")
+    print ("\t                               ppppppppp                        v" + version)
     print ("\n\n\n\n" + W)
 
     #Presentation
@@ -74,13 +79,22 @@ def asciipres():
     logging.info('%s',programinfo)
 
 def get_interface_ip(interface):
+    logging.info('Testing interfaces...')
     devnull = open(os.devnull, 'wb')
     output = subprocess.Popen(['ifconfig', interface], stdout=subprocess.PIPE, stderr=devnull).communicate()[0]
+    logging.info('%s',output)
     ip_lan_value = re.findall('192.168.([0-9]*).[0-9]* ', str(output))[0]
-    return (ip_lan_value)
+    ip_type=0
+    if ip_lan_value == -1:
+            ip_lan_value = re.findall('10.([0-9]*.[0-9]*).[0-9]* ', str(output))[0]
+            ip_type=1
+    logging.info('ip_lan_value is %s',ip_lan_value)
+    return (ip_lan_value,ip_type)
 
 def get_lan_ip():
+    logging.info('Getting lan ip...')
     iplan = socket.gethostbyname(socket.gethostname())
+    print (iplan)
     if iplan.startswith("127."):
         interfaces = [
             "eth0",
@@ -94,6 +108,7 @@ def get_lan_ip():
             "ppp0",
             ]
         for interface in interfaces:
+            print (interface)
             try:
                 iplan = get_interface_ip(interface)
                 break
@@ -108,6 +123,7 @@ logger = logging.getLogger('LogScanner')
 logging.basicConfig(filename='nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
 def inputs():
+    logging.info('Starting input requests...')
     error = 0
     #Ask for inputs
     try:
@@ -121,20 +137,29 @@ def inputs():
         logging.info('Initial port: %s',portrangefrom)
         portrangeto=input( G + "Enter the final port " + GR + "( ex: 80 )" + W + " - ")
         logging.info('Final port: %s',portrangeto)
-        showerr=input( G + "Print only the active ips? "+ GR + "(y/n)" + W + " - ")
-        logging.info('Only active ips? %s',showerr)
+        OnActIp=input( G + "Print only the active ips? "+ GR + "(y/n)" + W + " - ")
+        logging.info('Only active ips? %s',OnActIp)
         showhost=input( G + "Show the hostnames? " + GR + "(y/n)" + W + " - ")
         logging.info('Hostnames? %s',showhost)
     except NameError:
         error = 1
 
     #Defalut values
-    if iprangefrom == "":
-        lan_ip = get_lan_ip()
-        iprangefrom = "192.168." + lan_ip + ".1"
-    if iprangeto == "":
-        lan_ip = get_lan_ip()
-        iprangeto = "192.168." + lan_ip + ".254"
+    lan_ip = get_lan_ip()
+    if lan_ip[1]==0:
+        if iprangefrom == "":
+            iprangefrom = "192.168." + lan_ip[0] + ".1"
+            logging.info("Assigned initial ip: %s",iprangefrom)
+        if iprangeto == "":
+            iprangeto = "192.168." + lan_ip[0] + ".254"
+            logging.info("Assigned final ip: %s",iprangeto)
+    else:
+            if iprangefrom == "":
+                iprangefrom = "10." + lan_ip[0] + ".1"
+                logging.info("Assigned initial ip: %s",iprangefrom)
+            if iprangeto == "":
+                iprangeto = "10." + lan_ip[0] + ".254"
+                logging.info("Assigned final ip: %s",iprangeto)
     if portrangefrom == "":
         portfrom = 80
     else:
@@ -147,13 +172,15 @@ def inputs():
         portto = portto + 1
     if portfrom > portto:
         portto = portfrom + 1
-    if showerr == "":
-        showerr = "y"
+    if OnActIp == "":
+        OnActIp = "y"
     if showhost == "":
         showhost = "y"
 
     #Logging effective inputs
-    logging.info('Initial ip: %s',iprangefrom)
+    logging.info('Effective initial ip: %s',iprangefrom)
+    logging.info('Effective final ip: %s',iprangeto)
+
 
     #A little alert
     print("")
@@ -162,28 +189,18 @@ def inputs():
     print ("")
 
     #Checking errors
-    ipfromcheck = iprangefrom.split('.')
-    iptocheck = iprangeto.split('.')
-    ipfromcheck0 = int(ipfromcheck[0])
-    ipfromcheck1 = int(ipfromcheck[1])
-    ipfromcheck2 = int(ipfromcheck[2])
-    ipfromcheck3 = int(ipfromcheck[3])
-    iptocheck0 = int(iptocheck[0])
-    iptocheck1 = int(iptocheck[1])
-    iptocheck2 = int(iptocheck[2])
-    iptocheck3 = int(iptocheck[3])
-
-    if ipfromcheck0 < 1 or ipfromcheck0 > 254 or ipfromcheck1 < 0 or ipfromcheck1 > 254 or ipfromcheck2 < 0 or ipfromcheck2 > 254 or ipfromcheck3 < 1 or ipfromcheck3 > 254:
+    try:
+        if ipaddress.ip_address(iprangefrom) > ipaddress.ip_address(iprangeto):
+            print (G + "-=" * 31)
+            print (R + "Invalid ips, please check your inputs and try again..." + W)
+            print (G + "-=" * 31)
+            logging.error('Invalid ips: %s - %s.',iprangefrom,iprangeto)
+            error = 1
+    except ValueError:
         print (G + "-=" * 31)
-        print (R + "Invalid initial ip, please check your inputs and try again..." + W)
+        print (R + "Invalid ips, please check your inputs and try again..." + W)
         print (G + "-=" * 31)
-        logging.error('Invalid initial ip: %s.',ipfromcheck)
-        error = 1
-    if iptocheck0 < 1 or iptocheck0 > 254 or iptocheck1 < 0 or iptocheck1 > 254 or iptocheck2 < 0 or iptocheck2 > 254 or iptocheck3 < 1 or iptocheck3 > 254:
-        print (G + "-=" * 31)
-        print (R + "Invalid final ip, please check your inputs and try again..." + W)
-        print (G + "-=" * 31)
-        logging.error('Invalid final ip: %s.',iptocheck)
+        logging.error('Invalid ips: %s - %s.',iprangefrom,iprangeto)
         error = 1
     if portfrom < 0 or portfrom > 65536:
         print (G + "-=" * 31)
@@ -197,18 +214,19 @@ def inputs():
         print (G + "-=" * 31)
         logging.error('Invalid final port: %s. Enter a valid value (1 - 65535)',port)
         error = 1
-    if (showerr != "y" and showerr != "n" and showerr != "yes" and showerr != "no") or(showhost != "y" and showhost != "n" and showhost != "yes" and showhost != "no"):
+    if (OnActIp != "y" and OnActIp != "n" and OnActIp != "yes" and OnActIp != "no") or(showhost != "y" and showhost != "n" and showhost != "yes" and showhost != "no"):
         print (G + "-=" * 31)
         print (R + "Invalid Inputs, please check your inputs and try again..." + W)
         print (G + "-=" * 31)
-        logging.error('Invalid Inputs: %s - %s. Enter a valid integer value (y/n)',showerr,showhost)
+        logging.error('Invalid Inputs: %s - %s. Enter a valid integer value (y/n)',OnActIp,showhost)
         error = 1
     if error == 1:
         print ("")
         sys.exit('Check nips.log for details.\n')
-    return iprangefrom, iprangeto, portfrom, portto, showerr, showhost;
+    return iprangefrom, iprangeto, portfrom, portto, OnActIp, showhost;
 
 def scan_process(inputs):
+    logging.info('Starting scan process...')
     #Define variables
     p = [] # ip -> process
     devnull = open(os.devnull, 'wb')
@@ -217,7 +235,7 @@ def scan_process(inputs):
     iprangeto = inputs[1]
     portfrom = inputs[2]
     portto = inputs[3]
-    showerr = inputs[4]
+    OnActIp = inputs[4]
     showhost = inputs[5]
     act=0
     nrp=0
@@ -225,50 +243,32 @@ def scan_process(inputs):
     opn=0
     clsd=0
     total=0
-    ipfrom = iprangefrom.split('.')
     # Check what time the scan started
     t1 = datetime.now()
     print (GR + "Scanning ip range " + C + iprangefrom + GR + " - " + C + iprangeto + GR + "\n This can take a while, please be patient." + R)
     logging.info('Scanning ip range')
     print ("")
     while True:
-        ipfrom[0] = str(ipfrom[0])
-        ipfrom[1] = str(ipfrom[1])
-        ipfrom[2] = str(ipfrom[2])
-        ipfrom[3] = str(ipfrom[3])
-        ipping = ipfrom[0] + '.' + ipfrom[1] + '.' + ipfrom[2] + '.' + ipfrom[3]
-        p.append((ipping, Popen(['ping', '-c', '3', ipping], stdout=devnull, stderr=devnull)))
-        if ipping == iprangeto:
+        p.append((iprangefrom, Popen(['ping', '-c', '3', iprangefrom], stdout=devnull, stderr=devnull)))
+        if iprangefrom == iprangeto:
             break
-        ipfrom[0] = int(ipfrom[0])
-        ipfrom[1] = int(ipfrom[1])
-        ipfrom[2] = int(ipfrom[2])
-        ipfrom[3] = int(ipfrom[3])
-        ipfrom[3] = ipfrom[3] + 1
-        if ipfrom[3] == 255:
-            ipfrom[3] = 0
-            ipfrom[2] = ipfrom[2] + 1
-        if ipfrom[2] == 255:
-            ipfrom[2] = 0
-            ipfrom[1] = ipfrom[1] + 1
-        if ipfrom[1] == 255:
-            ipfrom[1] = 0
-            ipfrom[0] = ipfrom[0] + 1
+        ipp = int(ipaddress.ip_address(iprangefrom)) + 1
+        iprangefrom = str(ipaddress.ip_address(ipp))
     print (GR + "Starting port scan." + R)
     logging.info('Starting port scan.')
     print ("")
     while p:
-        for i, (ip, proc) in enumerate(p[:]):
+        for i, (iprangefrom, proc) in enumerate(p[:]):
             if proc.poll() is not None: # ping finished
-                p.remove((ip, proc)) # this makes it O(n**2)
+                p.remove((iprangefrom, proc)) # this makes it O(n**2)
                 if proc.returncode == 0:
-                    print (T + ip + GR + ':' + G + ' active' + W)
-                    logging.info('%s active',ip)
+                    print (T + iprangefrom + GR + ':' + G + ' active' + W)
+                    logging.info('%s active',iprangefrom)
                     act = act + 1
                     for port in range(portfrom, portto):
                         socket.setdefaulttimeout(0.5)
                         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        result = sock.connect_ex((ip, port))
+                        result = sock.connect_ex((iprangefrom, port))
                         if result == 0:
                             print (GR + "\tPort" + T ,port, GR + ":" + G + " Open" + W)
                             logging.info('Port %s: Open',port)
@@ -279,24 +279,24 @@ def scan_process(inputs):
                             clsd = clsd + 1
                     if showhost == "y" or showhost == "yes":
                         try:
-                            host = socket.gethostbyaddr(ip)
+                            host = socket.gethostbyaddr(iprangefrom)
                             print (GR + "\tHostname:"+ G,host[0], W)
                             logging.info("Hostname: %s",host[0])
                             logging.info("Alias list: %s",host[1])
                             logging.info("Ip Addresses List: %s",host[2])
                             host = None, None, None
                         except socket.error:
-                            logging.info("Hostname: Empty.")
+                            logging.info("Hostname: None.")
                     sock.close()
 
                 elif proc.returncode == 2:
-                    if showerr == "n" or showerr == "no":
-                        print (T + ip + GR + ':' + R + ' no response' + W)
+                    if OnActIp == "n" or OnActIp == "no":
+                        print (T + iprangefrom + GR + ':' + R + ' no response' + W)
                         logging.info('%s no response',ip)
                     nrp=nrp+1
                 else:
-                    if showerr == "n" or showerr == "no":
-                        print (T + ip + GR + ':' + R + ' error' + W)
+                    if OnActIp == "n" or OnActIp == "no":
+                        print (T + iprangefrom + GR + ':' + R + ' error' + W)
                         logging.info('%s error',ip)
                     err=err+1
         time.sleep(.04)
@@ -309,6 +309,7 @@ def scan_process(inputs):
     return total, act, err, nrp, opn, clsd
 
 def results(scan_process):
+    logging.info('Printing results...')
     total = scan_process[0]
     act = scan_process[1]
     err = scan_process[2]
@@ -339,12 +340,16 @@ def results(scan_process):
     print ("")
     print (P + "Good bye!" + W)
 
-try:
-    cls()
-    asciipres()
-    cls()
-    inputs = inputs()
-    scan_process = scan_process(inputs)
-    results(scan_process)
-except KeyboardInterrupt:
-    sys.exit("\n You pressed Ctrl+C")
+if __name__=='__main__':
+    try:
+        logging.info('Starting program...')
+        cls()
+        asciipres()
+        logging.info
+        cls()
+        inputs = inputs()
+        scan_process = scan_process(inputs)
+        results(scan_process)
+    except KeyboardInterrupt:
+        sys.exit("\n You pressed Ctrl+C")
+        logging.info('Ctrl+C. Exiting...')
