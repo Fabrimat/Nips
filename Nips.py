@@ -9,6 +9,12 @@
 from __future__ import print_function
 import os
 import sys
+import logging
+
+#Configuring logging
+logger = logging.getLogger('LogScanner')
+logging.basicConfig(filename='nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
 if os.name != "posix":
     sys.exit("\nOS not supported.\n")
     logging.error("%s not supported.",os.name)
@@ -17,7 +23,6 @@ from subprocess import Popen
 import socket
 import subprocess
 from datetime import datetime
-import logging
 import fcntl
 import struct
 import ipaddress
@@ -113,6 +118,7 @@ def Patrick(W, R, G, O, B, P, C, GR, T):
     print ( GR + "" + P + "▀██" + R + "▒▒▒▒▒▒▒▒▒▒▒" + P + "▓██" + R + "▒▒▒▒▒▒▒▒▒▒▒▒▒" + P + "██▀" + GR + " ")
     print ( GR + "──" + P + "██" + R + "▒▒▒▒▒▒▒▒▒" + P + "██████" + R + "▒▒▒▒▒▒▒▒▒▒" + P + "██" + GR + "── ")
     print ( GR + "───" + P + "███████████▌▌▌▌████████████" + GR + "───")
+#   print (print_cursor())
 
 def get_interface_ip(interface):
     logging.info('Testing interfaces...')
@@ -156,10 +162,6 @@ def get_lan_ip():
     print (iplan)
     return iplan[0],iplan[1],iplan[2]
 
-#Configuring logging
-logger = logging.getLogger('LogScanner')
-logging.basicConfig(filename='nips.log',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
-
 def inputs(W, R, G, O, B, P, C, GR, T):
     logging.info('Starting input requests...')
     error = 0
@@ -183,24 +185,25 @@ def inputs(W, R, G, O, B, P, C, GR, T):
         error = 1
 
     #Defalut values
-    lan_ip = get_lan_ip()
-    print (lan_ip[0])
-    print (lan_ip[1])
-    print (lan_ip[2])
-    if lan_ip[2]==0:
-        if iprangefrom == "":
-            iprangefrom = "192.168." + lan_ip[0] + ".1"
-            logging.info("Assigned initial ip: %s",iprangefrom)
-        if iprangeto == "":
-            iprangeto = "192.168." + lan_ip[0] + ".254"
-            logging.info("Assigned final ip: %s",iprangeto)
-    else:
+    if iprangeto == "aaa":
+        lan_ip = get_lan_ip()
+        print (lan_ip[0])
+        print (lan_ip[1])
+        print (lan_ip[2])
+        if lan_ip[2]==0:
             if iprangefrom == "":
-                iprangefrom = "10." + lan_ip[0] + "." + lan_ip[1] + ".1"
+                iprangefrom = "192.168." + lan_ip[0] + ".1"
                 logging.info("Assigned initial ip: %s",iprangefrom)
             if iprangeto == "":
-                iprangeto = "10." + lan_ip[0] + "." + lan_ip[1] + ".254"
+                iprangeto = "192.168." + lan_ip[0] + ".254"
                 logging.info("Assigned final ip: %s",iprangeto)
+        else:
+                if iprangefrom == "":
+                    iprangefrom = "10." + lan_ip[0] + "." + lan_ip[1] + ".1"
+                    logging.info("Assigned initial ip: %s",iprangefrom)
+                if iprangeto == "":
+                    iprangeto = "10." + lan_ip[0] + "." + lan_ip[1] + ".254"
+                    logging.info("Assigned final ip: %s",iprangeto)
     if portrangefrom == "":
         portfrom = 80
     else:
